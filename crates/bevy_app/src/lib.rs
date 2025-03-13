@@ -65,5 +65,5 @@ pub mod prelude {
 
     #[cfg(feature = "bevy_tasks")]
     #[doc(hidden)]
-    pub use crate::{NonSendMarker, TaskPoolOptions, TaskPoolPlugin};
+    pub use crate::{TaskPoolOptions, TaskPoolPlugin};
 }

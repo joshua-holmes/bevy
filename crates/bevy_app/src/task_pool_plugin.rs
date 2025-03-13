@@ -1,13 +1,14 @@
 use crate::{App, Plugin};
 
 use alloc::string::ToString;
+use bevy_ecs::system::NonSendMarker;
 use bevy_platform_support::sync::Arc;
 use bevy_tasks::{AsyncComputeTaskPool, ComputeTaskPool, IoTaskPool, TaskPoolBuilder};
-use core::{fmt::Debug, marker::PhantomData};
+use core::fmt::Debug;
 use log::trace;
 
 #[cfg(not(target_arch = "wasm32"))]
-use {crate::Last, bevy_ecs::prelude::NonSend};
+use crate::Last;
 
 #[cfg(not(target_arch = "wasm32"))]
 use bevy_tasks::tick_global_task_pools_on_main_thread;
@@ -28,15 +29,13 @@ impl Plugin for TaskPoolPlugin {
         _app.add_systems(Last, tick_global_task_pools);
     }
 }
-/// A dummy type that is [`!Send`](Send), to force systems to run on the main thread.
-pub struct NonSendMarker(PhantomData<*mut ()>);
 
 /// A system used to check and advanced our task pools.
 ///
 /// Calls [`tick_global_task_pools_on_main_thread`],
 /// and uses [`NonSendMarker`] to ensure that this system runs on the main thread
 #[cfg(not(target_arch = "wasm32"))]
-fn tick_global_task_pools(_main_thread_marker: Option<NonSend<NonSendMarker>>) {
+fn tick_global_task_pools(_main_thread_marker: NonSendMarker) {
     tick_global_task_pools_on_main_thread();
 }
 
